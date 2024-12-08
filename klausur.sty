@@ -1,0 +1,125 @@
+\ProvidesPackage{klausur}[2024/12/08 v2.0 Klausur-Paket]
+
+% Pakete laden
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[T1]{fontenc}
+\RequirePackage[ngerman]{babel}
+\RequirePackage{amsmath,amssymb}
+\RequirePackage{graphicx}
+\RequirePackage{geometry}
+\RequirePackage{fancyhdr}
+\RequirePackage{enumitem}
+\RequirePackage{lastpage} % Für Seitenzahlen im Stil "1 von X"
+\usepackage{tikz} % Für die Gestaltung der Punktzahlen im rechten Rand
+\newcounter{aufgabenCounter} % Zähler für Aufgaben
+\newcounter{teilaufgabenCounter} % Zähler für Teilaufgaben
+\newcounter{gesamtPunkte} % Gesamtpunkte für die Aufgabe
+
+% Seitenlayout
+\geometry{a4paper, top=2.5cm, bottom=3cm, left=2cm, right=2cm}
+% Kopf- und Fußzeile
+\pagestyle{fancy}
+\fancyhf{} % Kopf- und Fußzeile leeren
+
+% Parameter definieren
+\newcommand{\klasse}{}
+\newcommand{\titel}{}
+\newcommand{\datum}{}
+\newcommand{\arbeitszeit}{}
+
+\newcommand{\setklasse}[1]{\renewcommand{\klasse}{#1}}
+\newcommand{\settitel}[1]{\renewcommand{\titel}{#1}}
+\newcommand{\setdatum}[1]{\renewcommand{\datum}{#1}}
+\newcommand{\setarbeitszeit}[1]{\renewcommand{\arbeitszeit}{#1}}
+
+% Titelmakro für die erste Seite
+\newcommand{\klausurtitel}{
+\setcounter{gesamtPunkte}{0}
+\vspace*{-3cm}
+    \begin{center}
+    \vspace*{1cm}
+        {\Large\textbf{\titel}}\\[0.3cm]
+        {\normalsize \textbf{Klasse:} \klasse \hspace{1.5cm} \textbf{Datum:} \datum \hspace{1.5cm} \textbf{Arbeitszeit:} \arbeitszeit~Minuten}\\[0.3cm]
+        \textbf{Name: \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_}
+        \vspace{0.2cm}
+	\hrule
+    \end{center}
+}
+
+\newcommand{\gesamtpunkte}{
+\vspace*{0.5cm}
+\hrule
+\vspace*{0.5cm}
+$\text{ }$\hfill $\Sigma$~\rule{0.8cm}{0.4pt}\ / \thegesamtPunkte~BE 
+}
+
+% Kopf- und Fußzeilen anpassen
+
+\fancypagestyle{erste-seite}{
+    \fancyhf{} % Kopf- und Fußzeile leeren
+    \fancyfoot[C]{Seite \thepage\ von \pageref{LastPage}} % Seitenzahl unten zentriert
+    \renewcommand{\headrulewidth}{0pt} % Kein Strich in der Kopfzeile
+}
+
+
+
+% Stil für weitere Seiten
+\fancypagestyle{weitere-seiten}{
+    \fancyhf{} % Kopf- und Fußzeile leeren
+    \fancyhead[L]{\titel} % Titel links in der Kopfzeile
+    \fancyhead[R]{Klasse: \klasse} % Klasse rechts in der Kopfzeile
+    \renewcommand{\headrulewidth}{0.4pt} % Dünner Strich in der Kopfzeile
+    \fancyfoot[C]{Seite \thepage\ von \pageref{LastPage}} % Seitenzahl unten zentriert
+}
+\AtBeginDocument{%
+    \thispagestyle{erste-seite} % Stil der ersten Seite automatisch setzen
+    }
+\pagestyle{weitere-seiten} % Standardstil für alle weiteren Seiten anpassen
+
+% Aufgabe Umgebung definieren
+
+\newenvironment{aufgabe2}[1]{
+\par
+    \refstepcounter{aufgabenCounter} % Aufgabe Zähler erhöhen
+    \setcounter{teilaufgabenCounter}{0} % Teilaufgaben Zähler zurücksetzen
+    \noindent\textbf{Aufgabe \theaufgabenCounter:} #1
+    \par
+}{
+\vspace{0.5cm}
+}
+
+
+
+\newenvironment{aufgabe}[2][]{
+\par
+    \refstepcounter{aufgabenCounter} % Aufgabe Zähler erhöhen
+    \setcounter{teilaufgabenCounter}{0} % Teilaufgaben Zähler zurücksetzen
+    \noindent\textbf{Aufgabe \theaufgabenCounter:} #2  % Ausgabe des Aufgabentextes
+    \ifx&#1&% Überprüfen, ob der optionale Parameter leer ist
+        % Nichts tun, Punkte werden aus Teilaufgaben aufsummiert
+    \else
+        \addtocounter{gesamtPunkte}{#1} % Direkt die Punktzahl übernehmen
+	\addtocounter{teilaufgabenCounter}{#1}
+        $\text{ }$\hfill \rule{0.8cm}{0.4pt}\ / \theteilaufgabenCounter~BE
+	\par
+    \fi
+}{
+  \vspace{0.5cm} 
+}
+\newcommand{\teilaufgabe}[2][]{
+\par
+\noindent
+    \refstepcounter{teilaufgabenCounter} % Teilaufgaben Zähler erhöhen
+    \addtocounter{gesamtPunkte}{#1} % Punktzahl zur Gesamtpunktzahl der Aufgabe hinzufügen
+    \noindent\textbf{\alph{teilaufgabenCounter})} % Nummerierung a), b), c)
+    #2 % Ausgabe des Inhalts der Teilaufgabe
+    \hfill \normalfont \rule{0.8cm}{0.4pt}\ / \ #1~BE % Punktzahl rechtsbündig anzeigen, ohne fett
+    \par
+}
+
+\newcommand{\aufgabentext}[1][]{
+\vspace{0.2cm}
+  \noindent #1 
+\vspace{0.2cm}
+}
+
