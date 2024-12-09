@@ -10,6 +10,22 @@
 \RequirePackage{fancyhdr}
 \RequirePackage{enumitem}
 \RequirePackage{lastpage} % Für Seitenzahlen im Stil "1 von X"
+\RequirePackage{ziffer}
+\usepackage{siunitx} % Einheiten so: \SI{3.4}{kg} -> 3,4 kg
+\sisetup{locale = DE}
+\RequirePackage{eurosym}
+
+\usepackage{listings}
+\lstset
+{
+    basicstyle=\footnotesize,
+    numbers=left,
+    stepnumber=1,
+    showstringspaces=false,
+    tabsize=2,
+    breaklines=true,
+    breakatwhitespace=false,
+}
 \usepackage{tikz} % Für die Gestaltung der Punktzahlen im rechten Rand
 \newcounter{aufgabenCounter} % Zähler für Aufgaben
 \newcounter{teilaufgabenCounter} % Zähler für Teilaufgaben
@@ -31,6 +47,52 @@
 \newcommand{\settitel}[1]{\renewcommand{\titel}{#1}}
 \newcommand{\setdatum}[1]{\renewcommand{\datum}{#1}}
 \newcommand{\setarbeitszeit}[1]{\renewcommand{\arbeitszeit}{#1}}
+
+\newcommand{\eur}[1]{\SI{#1}{\text{\euro}}}
+\newcommand{\xachse}{\draw[->] (\myplotxa,0) -- (\myplotxb,0) node[right] {$x$};}
+\newcommand{\hachse}[1]{\draw[->] (\myplotxa,0) -- (\myplotxb,0) node[right] {$#1$};}
+\newcommand{\yachse}{\draw[->] (0,\myplotya) -- (0,\myplotyb) node[above] {$y$};}
+\newcommand{\vachse}[1]{\draw[->] (0,\myplotya) -- (0,\myplotyb) node[above] {$#1$};}
+\newcommand{\plot}[2]{\draw[samples=300,smooth,thick] plot  (\x, {#1}) node[right] {$#2$};}
+\newcommand{\plotvonbis}[4]{\draw[samples=300,smooth,thick,domain=#3:#4] plot  (\x, {#1}) node[right] {$#2$};}
+\newcommand{\plotgrid}{\draw[step=1cm,gray, dotted, thick] (\myplotxa,\myplotya) grid (\myplotxb,\myplotyb);}
+\newcommand{\xachsenbeschriftung}{
+\pgfmathsetmacro{\myplotstart}{ceil(\myplotxa)}
+\pgfmathsetmacro{\myplotend}{floor(\myplotxb)}
+  \foreach \x in {\myplotstart ,...,\myplotend } {
+    \pgfmathtruncatemacro{\xint}{\x}
+    \draw (\xint, 0.1) -- (\xint, -0.1) node[below] {\xint};
+  }
+}
+\newcommand{\yachsenbeschriftung}{
+\pgfmathsetmacro{\myplotstart}{ceil(\myplotya)}
+\pgfmathsetmacro{\myplotend}{floor(\myplotyb)}
+  \foreach \y in {\myplotstart ,...,\myplotend } {
+    \pgfmathtruncatemacro{\yint}{\y}
+    \draw (0.1, \yint) -- (-0.1, \yint) node[left] {\yint};
+  }
+}
+\newcommand{\achsenbeschriftung}{
+\xachsenbeschriftung\yachsenbeschriftung}
+
+
+\newcounter{myplotxa}
+\newcounter{myplotxb}
+\newcounter{myplotya}
+\newcounter{myplotyb}
+\newenvironment{myplot}[4]{
+\pgfmathsetmacro{\myplotxa}{#1}
+\pgfmathsetmacro{\myplotxb}{#3}
+\pgfmathsetmacro{\myplotya}{#2}
+\pgfmathsetmacro{\myplotyb}{#4}
+\begingroup% Begin a group to localize changes
+\begin{tikzpicture}[domain=\myplotxa:\myplotxb]%
+}{
+\end{tikzpicture}
+\endgroup
+\newline
+}
+
 
 % Titelmakro für die erste Seite
 \newcommand{\klausurtitel}{
@@ -77,19 +139,6 @@ $\text{ }$\hfill $\Sigma$~\rule{0.8cm}{0.4pt}\ / \thegesamtPunkte~BE
 \pagestyle{weitere-seiten} % Standardstil für alle weiteren Seiten anpassen
 
 % Aufgabe Umgebung definieren
-
-\newenvironment{aufgabe2}[1]{
-\par
-    \refstepcounter{aufgabenCounter} % Aufgabe Zähler erhöhen
-    \setcounter{teilaufgabenCounter}{0} % Teilaufgaben Zähler zurücksetzen
-    \noindent\textbf{Aufgabe \theaufgabenCounter:} #1
-    \par
-}{
-\vspace{0.5cm}
-}
-
-
-
 \newenvironment{aufgabe}[2][]{
 \par
     \refstepcounter{aufgabenCounter} % Aufgabe Zähler erhöhen
