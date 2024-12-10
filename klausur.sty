@@ -27,12 +27,13 @@
     breakatwhitespace=false,
 }
 \usepackage{tikz} % Für die Gestaltung der Punktzahlen im rechten Rand
+\usetikzlibrary{calc}
 \newcounter{aufgabenCounter} % Zähler für Aufgaben
 \newcounter{teilaufgabenCounter} % Zähler für Teilaufgaben
 \newcounter{gesamtPunkte} % Gesamtpunkte für die Aufgabe
 
 % Seitenlayout
-\geometry{a4paper, top=2.5cm, bottom=3cm, left=2cm, right=2cm}
+\geometry{a4paper, top=2.5cm, bottom=3cm, left=1.5cm, right=3.5cm}
 % Kopf- und Fußzeile
 \pagestyle{fancy}
 \fancyhf{} % Kopf- und Fußzeile leeren
@@ -55,7 +56,9 @@
 \newcommand{\vachse}[1]{\draw[->] (0,\myplotya) -- (0,\myplotyb) node[above] {$#1$};}
 \newcommand{\plot}[2]{\draw[samples=300,smooth,thick] plot  (\x, {#1}) node[right] {$#2$};}
 \newcommand{\plotvonbis}[4]{\draw[samples=300,smooth,thick,domain=#3:#4] plot  (\x, {#1}) node[right] {$#2$};}
-\newcommand{\plotgrid}{\draw[step=1cm,gray, dotted, thick] (\myplotxa,\myplotya) grid (\myplotxb,\myplotyb);}
+
+\newcommand{\plotgrid}{\draw[step=0.5cm,gray, dotted, thick] (\myplotxa,\myplotya) grid (\myplotxb,\myplotyb);}
+
 \newcommand{\xachsenbeschriftung}{
 \pgfmathsetmacro{\myplotstart}{ceil(\myplotxa)}
 \pgfmathsetmacro{\myplotend}{floor(\myplotxb)}
@@ -92,6 +95,13 @@
 \endgroup
 \newline
 }
+\newcommand{\grid}[1]{
+\begin{tikzpicture}
+\draw[step=0.5cm,color=gray] (0,0) grid (\linewidth ,#1);
+\end{tikzpicture}}
+\newcommand{\nlgrid}[1]{
+\newline
+\grid{#1}}
 
 
 % Titelmakro für die erste Seite
@@ -101,18 +111,20 @@
     \begin{center}
     \vspace*{1cm}
         {\Large\textbf{\titel}}\\[0.3cm]
-        {\normalsize \textbf{Klasse:} \klasse \hspace{1.5cm} \textbf{Datum:} \datum \hspace{1.5cm} \textbf{Arbeitszeit:} \arbeitszeit~Minuten}\\[0.3cm]
-        \textbf{Name: \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_}
+        {\normalsize \textbf{Klasse:} \klasse \hspace{1cm} \textbf{Datum:} \datum \hspace{1cm} \textbf{Arbeitszeit:} \arbeitszeit~Minuten}\\[0.3cm]
+	\textbf{Name: \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_}
         \vspace{0.2cm}
 	\hrule
     \end{center}
+    \begin{tikzpicture}[remember picture,overlay]
+\draw ($(current page.north east)+(-1cm, -1cm)$) rectangle  ($(current page.north east)+(-3cm, -3cm)$) ;
+\end{tikzpicture}
 }
 
 \newcommand{\gesamtpunkte}{
-\vspace*{0.5cm}
-\hrule
-\vspace*{0.5cm}
-$\text{ }$\hfill $\Sigma$~\rule{0.8cm}{0.4pt}\ / \thegesamtPunkte~BE 
+\vspace*{1cm}
+%$\text{ }$\hfill $\Sigma$~\rule{0.5cm}{0.4pt}\ / \thegesamtPunkte~BE 
+\marginpar{\raggedleft \normalfont \hspace*{-1cm}$\Sigma$~\rule{1cm}{0.4pt}~/\thegesamtPunkte}
 }
 
 % Kopf- und Fußzeilen anpassen
@@ -149,7 +161,8 @@ $\text{ }$\hfill $\Sigma$~\rule{0.8cm}{0.4pt}\ / \thegesamtPunkte~BE
     \else
         \addtocounter{gesamtPunkte}{#1} % Direkt die Punktzahl übernehmen
 	\addtocounter{teilaufgabenCounter}{#1}
-        $\text{ }$\hfill \rule{0.8cm}{0.4pt}\ / \theteilaufgabenCounter~BE
+        %$\text{ }$\hfill \rule{0.8cm}{0.4pt}\ / \theteilaufgabenCounter~BE
+	\marginpar{\raggedleft \normalfont \rule{0.5cm}{0.4pt}~/#1}
 	\par
     \fi
 }{
@@ -162,7 +175,7 @@ $\text{ }$\hfill $\Sigma$~\rule{0.8cm}{0.4pt}\ / \thegesamtPunkte~BE
     \addtocounter{gesamtPunkte}{#1} % Punktzahl zur Gesamtpunktzahl der Aufgabe hinzufügen
     \noindent\textbf{\alph{teilaufgabenCounter})} % Nummerierung a), b), c)
     #2 % Ausgabe des Inhalts der Teilaufgabe
-    \hfill \normalfont \rule{0.8cm}{0.4pt}\ / \ #1~BE % Punktzahl rechtsbündig anzeigen, ohne fett
+    \marginpar{\raggedleft \normalfont \rule{0.5cm}{0.4pt}~/#1}
     \par
 }
 
